@@ -1,0 +1,54 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: API для регистрации
+paths:
+  /register:
+    post:
+      summary: Регистрация нового пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                  example: password
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Пользователь успешно зарегистрирован и аутентифицирован
+          headers:
+            parameters:
+              $ref: '#/components/headers/AuthToken'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  login:
+                    type: string
+                  password:
+                    type: string
+        '400':
+          description: Неверный формат запроса
+        '409':
+          description: Логин уже занят
+        '500':
+          description: Внутренняя ошибка сервера
+
+
+
+
+components:
+  headers:
+    AuthToken:
+      description: Токен аутентификации
+      schema:
+        type: string
