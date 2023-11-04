@@ -27,15 +27,6 @@ paths:
           headers:
             parameters:
               $ref: '#/components/headers/AuthToken'
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  login:
-                    type: string
-                  password:
-                    type: string
         '400':
           description: Неверный формат запроса
         '409':
