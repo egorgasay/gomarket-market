@@ -7,6 +7,7 @@ import (
 
 func NewRouter(uc controller2.IUserController) *echo.Echo {
 	e := echo.New()
+
 	//e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 	//	AllowOrigins: []string{"http://localhost:8080", os.Getenv("FE_URL")},
 	//	AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept,
