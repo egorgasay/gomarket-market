@@ -27,15 +27,22 @@ func (s *userController) SignUp(c echo.Context) error {
 	}
 
 	uuid, err := s.userService.SignUp(user)
-	cookie := new(http.Cookie)
+	if err != nil {
+		// сделай логику обработки ошибки как у артема
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	cookie := http.Cookie{}
 	cookie.Name = "token"
 	cookie.Value = uuid
 	cookie.Expires = time.Now().Add(56 * time.Hour)
-	c.SetCookie(cookie)
+	c.SetCookie(&cookie)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
+	c.Response().Status = http.StatusOK
 	return nil
 }
 

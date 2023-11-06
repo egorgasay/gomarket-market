@@ -23,7 +23,6 @@ func Test_UserController_SignUp(t *testing.T) {
 	tests := []struct {
 		name        string
 		body        jso
-		sessionMock sessionMock
 		serviceMock serviceMock
 		wantCode    int
 	}{
@@ -33,27 +32,22 @@ func Test_UserController_SignUp(t *testing.T) {
 				Login:    "dima",
 				Password: "test1",
 			},
-			sessionMock: func(c *mocks.SessionUseCase) {
-				c.Mock.On("Generate").Return("ahsjufil12-fk", nil)
-			},
 			serviceMock: func(c *mocks.UserUseCase) {
-				c.Mock.On("SignUp", model.User{Username: "dima", Password: "test1", Session: "ahsjufil12-fk"}).Return("ahsjufil12-fk", nil).Times(1)
+				c.Mock.On("SignUp", model.User{Username: "dima", Password: "test1", Session: ""}).Return("ahsjufil12-fk", nil).Times(1)
 			},
 			wantCode: http.StatusOK,
 		},
 		{
 			name: "BAD",
 			body: jso{
-				Login: "dima",
-			},
-			sessionMock: func(c *mocks.SessionUseCase) {
-				c.Mock.On("Generate").Return("ahsjufil12-fk", nil)
+				Login:    "1",
+				Password: "1",
 			},
 			serviceMock: func(c *mocks.UserUseCase) {
-				user := model.User{Username: "dima", Password: "", Session: "ahsjufil12-fk"}
-				c.Mock.On("SignUp", user).Return("", errors.New("invalid")).Times(1)
+				user := model.User{Username: "1", Password: "1", Session: ""}
+				c.Mock.On("SignUp", user).Return("ahsjufil12-fk", errors.New("invalid")).Times(1)
 			},
-			wantCode: http.StatusBadRequest,
+			wantCode: http.StatusInternalServerError,
 		},
 	}
 
@@ -61,10 +55,8 @@ func Test_UserController_SignUp(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			e := echo.New()
 			service := mocks.NewUserUseCase(t)
-			sessionMock := mocks.NewSessionUseCase(t)
 			h := NewUserController(service)
 			tt.serviceMock(service)
-			tt.sessionMock(sessionMock)
 			b, err := json.Marshal(tt.body)
 			if err != nil {
 				return
@@ -74,6 +66,7 @@ func Test_UserController_SignUp(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			request := httptest.NewRequest(http.MethodPost, path, strings.NewReader(string(b)))
+			request.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			// создаём новый Recorder
 
 			e.ServeHTTP(w, request)
