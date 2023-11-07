@@ -1,20 +1,16 @@
 package repository
 
 import (
+	"go-rest-api/internal/domains"
 	"go-rest-api/internal/model"
 	"gorm.io/gorm"
 )
-
-type IUserRepository interface {
-	//GetUserByEmail(user *model.User, email string) error
-	CreateUser(user *model.User) error
-}
 
 type userRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) IUserRepository {
+func NewUserRepository(db *gorm.DB) domains.IUserRepository {
 	return &userRepository{db}
 }
 

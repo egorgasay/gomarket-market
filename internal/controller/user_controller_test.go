@@ -13,7 +13,6 @@ import (
 )
 
 type serviceMock func(c *mocks.UserUseCase)
-type sessionMock func(c *mocks.SessionUseCase)
 
 func Test_UserController_SignUp(t *testing.T) {
 	type jso struct {

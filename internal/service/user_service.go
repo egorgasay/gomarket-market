@@ -3,17 +3,16 @@ package service
 import (
 	"go-rest-api/internal/domains"
 	"go-rest-api/internal/model"
-	"go-rest-api/internal/repository"
 	"go-rest-api/internal/validator"
 )
 
 type userService struct {
-	database       repository.IUserRepository
+	database       domains.IUserRepository
 	validator      validator.IUserValidator
-	sessionService SessionService
+	sessionService domains.SessionUseCase
 }
 
-func NewUserUseCase(database repository.IUserRepository, validator validator.IUserValidator, sessionService SessionService) domains.UserUseCase {
+func NewUserUseCase(database domains.IUserRepository, validator validator.IUserValidator, sessionService domains.SessionUseCase) domains.UserUseCase {
 	return &userService{database, validator, sessionService}
 }
 
