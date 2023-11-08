@@ -7,15 +7,16 @@ import (
 	"testing"
 )
 
-type sessionMock func(c *mocks.SessionUseCase)
-type repositoryMock func(c *mocks.IUserRepository)
+type sessionMock[A any] func(c *mocks.SessionUseCase, args A)
+type repositoryMock[A any] func(c *mocks.IUserRepository, args A)
 
 func Test_userService_SignUp(t *testing.T) {
+	invalidErr := errors.New("invalid")
 	tests := []struct {
 		name           string
 		args           model.User
-		sessionMock    sessionMock
-		repositoryMock repositoryMock
+		sessionMock    sessionMock[model.User]
+		repositoryMock repositoryMock[model.User]
 		wantErr        error
 	}{
 		{
@@ -25,41 +26,46 @@ func Test_userService_SignUp(t *testing.T) {
 				Password: "test1",
 				Session:  "ahsjufil12-fk",
 			},
-			sessionMock: func(c *mocks.SessionUseCase) {
-				c.Mock.On("Generate").Return("ahsjufil12-fk", nil).Times(1)
+			sessionMock: func(c *mocks.SessionUseCase, user model.User) {
+				c.Mock.On("Generate").Return(user.Session, nil).Times(1)
 			},
-			repositoryMock: func(c *mocks.IUserRepository) {
-				c.Mock.On("CreateUser", model.User{Username: "dima", Password: "test1", Session: "ahsjufil12-fk"}).Return(nil)
+			repositoryMock: func(c *mocks.IUserRepository, user model.User) {
+				c.Mock.On("CreateUser", user).Return(nil)
 			},
 			wantErr: nil,
 		},
 		{
-			name: "OK1",
+			name: "BAD1",
 			args: model.User{
 				Username: "dima",
 				Password: "test1",
 				Session:  "ahsjufil12-fk",
 			},
-			sessionMock: func(c *mocks.SessionUseCase) {
-				c.Mock.On("Generate").Return("ahsjufil12-fk", nil).Times(1)
+			sessionMock: func(c *mocks.SessionUseCase, user model.User) {
+				c.Mock.On("Generate").Return(user.Session, nil).Times(1)
 			},
-			repositoryMock: func(c *mocks.IUserRepository) {
-				c.Mock.On("CreateUser", model.User{Username: "dima", Password: "test1", Session: "ahsjufil12-fk"}).Return(errors.New("invalid")).Times(1)
+			repositoryMock: func(c *mocks.IUserRepository, user model.User) {
+				c.Mock.On("CreateUser", user).Return(invalidErr).Times(1)
 			},
-			wantErr: errors.New("invalid"),
+			wantErr: invalidErr,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			storage := mocks.NewIUserRepository(t)
 			session := mocks.NewSessionUseCase(t)
+			tt.repositoryMock(storage, tt.args)
+			tt.sessionMock(session, tt.args)
 			service := userService{
 				database:       storage,
 				sessionService: session,
 			}
-			_, err := service.SignUp(tt.args)
-			if errors.Is(err, tt.wantErr) {
-				t.Errorf("got %d, want %d", err, tt.wantErr)
+			cook, err := service.SignUp(tt.args)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("got %v, want %v", err, tt.wantErr)
+			}
+			if tt.wantErr == nil && cook != tt.args.Session {
+				t.Errorf("got %s, want %s", cook, tt.args.Session)
 			}
 		})
 	}

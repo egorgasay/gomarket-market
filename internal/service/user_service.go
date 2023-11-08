@@ -17,9 +17,9 @@ func NewUserUseCase(database domains.IUserRepository, validator validator.IUserV
 }
 
 func (s *userService) SignUp(user model.User) (string, error) {
-	if err := s.validator.UserValidate(user); err != nil {
-		return "", err
-	}
+	//if err := s.validator.UserValidate(user); err != nil {
+	//	return "", err
+	//}
 	//hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	//if err != nil {
 	//	return err
@@ -29,7 +29,7 @@ func (s *userService) SignUp(user model.User) (string, error) {
 		return "", err
 	}
 	newUser := model.User{Username: user.Username, Password: user.Password, Session: uuid}
-	if err := s.database.CreateUser(&newUser); err != nil {
+	if err := s.database.CreateUser(newUser); err != nil {
 		return "", err
 	}
 	return uuid, nil
