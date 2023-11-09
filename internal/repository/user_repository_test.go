@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/egorgasay/dockerdb/v3"
+	_ "github.com/lib/pq"
 	"go-rest-api/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -57,7 +58,7 @@ func Test_userRepository_CreateUser(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			if err := gormDB.Create(tt.args.user); err != nil {
+			if err = gormDB.Create(tt.args.user).Error; err != nil {
 				t.Errorf("CreateUser() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
