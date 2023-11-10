@@ -7,12 +7,12 @@ import (
 )
 
 type userService struct {
-	database       domains.IUserRepository
+	database       domains.IRepository
 	validator      validator.IUserValidator
-	sessionService domains.SessionUseCase
+	sessionService domains.SessionService
 }
 
-func NewUserUseCase(database domains.IUserRepository, validator validator.IUserValidator, sessionService domains.SessionUseCase) domains.UserUseCase {
+func NewUserUseCase(database domains.IRepository, validator validator.IUserValidator, sessionService domains.SessionService) domains.Service {
 	return &userService{database, validator, sessionService}
 }
 

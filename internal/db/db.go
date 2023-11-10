@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 	"go-rest-api/config"
-	model2 "go-rest-api/internal/model"
+	"go-rest-api/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
@@ -15,7 +15,7 @@ func NewDB(config config.Config) *gorm.DB {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	err = db.AutoMigrate(&model2.User{})
+	err = db.AutoMigrate(&model.User{})
 	if err != nil {
 		return nil
 	}

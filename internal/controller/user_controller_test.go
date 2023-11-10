@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-type serviceMock func(c *mocks.UserUseCase)
+type serviceMock func(c *mocks.Service)
 
 func Test_UserController_SignUp(t *testing.T) {
 	type jso struct {
@@ -31,7 +31,7 @@ func Test_UserController_SignUp(t *testing.T) {
 				Login:    "dima",
 				Password: "test1",
 			},
-			serviceMock: func(c *mocks.UserUseCase) {
+			serviceMock: func(c *mocks.Service) {
 				c.Mock.On("SignUp", model.User{Username: "dima", Password: "test1", Session: ""}).Return("ahsjufil12-fk", nil).Times(1)
 			},
 			wantCode: http.StatusOK,
@@ -42,7 +42,7 @@ func Test_UserController_SignUp(t *testing.T) {
 				Login:    "1",
 				Password: "1",
 			},
-			serviceMock: func(c *mocks.UserUseCase) {
+			serviceMock: func(c *mocks.Service) {
 				user := model.User{Username: "1", Password: "1", Session: ""}
 				c.Mock.On("SignUp", user).Return("ahsjufil12-fk", errors.New("invalid")).Times(1)
 			},
@@ -53,7 +53,7 @@ func Test_UserController_SignUp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := echo.New()
-			service := mocks.NewUserUseCase(t)
+			service := mocks.NewService(t)
 			h := NewUserController(service)
 			tt.serviceMock(service)
 			b, err := json.Marshal(tt.body)

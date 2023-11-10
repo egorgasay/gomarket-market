@@ -2,7 +2,7 @@ package main
 
 import (
 	"go-rest-api/config"
-	controller2 "go-rest-api/internal/controller"
+	"go-rest-api/internal/controller"
 	"go-rest-api/internal/controller/router"
 	"go-rest-api/internal/db"
 	"go-rest-api/internal/repository"
@@ -17,7 +17,7 @@ func main() {
 	userRepository := repository.NewUserRepository(db)
 	sessionSevice := service.NewSessionService()
 	userUsecase := service.NewUserUseCase(userRepository, userValidator, &sessionSevice)
-	userController := controller2.NewUserController(userUsecase)
+	userController := controller.NewUserController(userUsecase)
 	e := router.NewRouter(userController)
 	e.Logger.Fatal(e.Start(":8080"))
 }
