@@ -5,9 +5,9 @@ import (
 	"errors"
 	"github.com/egorgasay/dockerdb/v3"
 	_ "github.com/lib/pq"
+	"go-rest-api/config"
+	"go-rest-api/internal/db"
 	"go-rest-api/internal/model"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log"
 	"testing"
 )
@@ -53,12 +53,13 @@ func Test_userRepository_CreateUser(t *testing.T) {
 			}
 			defer vdb.Clear(ctx)
 
-			gormDB, err := gorm.Open(postgres.Open(vdb.GetSQLConnStr()), &gorm.Config{})
+			//gormDB, err := gorm.Open(postgres.Open(vdb.GetSQLConnStr()), &gorm.Config{})
+			gormDB := db.NewDB(config.Config{DB: vdb.GetSQLConnStr()})
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			if err = gormDB.Create(tt.args.user).Error; err != nil {
+			if err = gormDB.Create(&tt.args.user).Error; err != nil {
 				t.Errorf("CreateUser() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
