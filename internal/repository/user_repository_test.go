@@ -8,7 +8,6 @@ import (
 	"go-rest-api/config"
 	"go-rest-api/internal/db"
 	"go-rest-api/internal/model"
-	"log"
 	"testing"
 )
 
@@ -49,17 +48,19 @@ func Test_userRepository_CreateUser(t *testing.T) {
 			ctx := context.TODO()
 			vdb, err := dockerdb.New(ctx, dockerdb.PostgresConfig("market").Build())
 			if err != nil {
-				log.Fatal(err)
+				t.Fatal(err)
 			}
 			defer vdb.Clear(ctx)
 
 			//gormDB, err := gorm.Open(postgres.Open(vdb.GetSQLConnStr()), &gorm.Config{})
 			gormDB := db.NewDB(config.Config{DB: vdb.GetSQLConnStr()})
 			if err != nil {
-				log.Fatal(err)
+				t.Fatal(err)
 			}
-
-			if err = gormDB.Create(&tt.args.user).Error; err != nil {
+			db := userRepository{
+				db: gormDB,
+			}
+			if err = db.CreateUser(tt.args.user); err != nil {
 				t.Errorf("CreateUser() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
