@@ -64,6 +64,11 @@ func Test_userRepository_CreateUser(t *testing.T) {
 			if err = db.CreateUser(tt.args.user); err != nil {
 				t.Errorf("CreateUser() error = %v, wantErr %v", err, tt.wantErr)
 			}
+			var count int64
+			gormDB.Model(tt.args.user).Where("username = ?", tt.args.user.Username).Count(&count)
+			if count == 0 {
+				t.Fatal("Expected user to exist in database")
+			}
 		})
 	}
 }
