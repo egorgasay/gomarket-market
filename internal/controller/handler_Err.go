@@ -1,4 +1,4 @@
-package errors
+package controller
 
 import (
 	"encoding/json"
@@ -9,14 +9,14 @@ import (
 )
 
 func Handler(c echo.Context, err error) error {
-	var unmarshalTypeError *json.UnmarshalTypeError
+	var UnmarshalTypeError *json.UnmarshalTypeError
 	if err != nil {
-		if errors.Is(err, ErrEnabledData) {
+		if errors.Is(err, ErrInvalidData) {
 			err := fmt.Sprintf("enabled data %s", err)
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		if errors.As(err, &unmarshalTypeError) {
+		if errors.As(err, &UnmarshalTypeError) {
 			err := fmt.Sprintf("bad json %s", err)
 			return c.JSON(http.StatusBadRequest, err)
 		}

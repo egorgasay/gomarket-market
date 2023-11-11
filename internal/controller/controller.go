@@ -3,7 +3,6 @@ package controller
 import (
 	"github.com/labstack/echo/v4"
 	"go-rest-api/internal/domains"
-	"go-rest-api/internal/errors"
 	"go-rest-api/internal/model"
 	"net/http"
 	"time"
@@ -22,14 +21,14 @@ func NewUserController(userService domains.Service) IUserController {
 }
 
 func (s *userController) SignUp(c echo.Context) error {
-	user := model.User{}
-	if err := c.Bind(&user); err != nil {
-		return errors.Handler(c, err)
+	data := model.User{}
+	if err := c.Bind(&data); err != nil {
+		return Handler(c, err)
 	}
 
-	uuid, err := s.userService.SignUp(user)
+	uuid, err := s.userService.SignUp(data)
 	if err != nil {
-		return errors.Handler(c, err)
+		return Handler(c, err)
 	}
 	cookie := http.Cookie{}
 	cookie.Name = "token"

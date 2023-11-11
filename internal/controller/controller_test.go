@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/labstack/echo/v4"
 	"go-rest-api/internal/domains/mocks"
 	"go-rest-api/internal/model"
@@ -44,9 +43,9 @@ func Test_UserController_SignUp(t *testing.T) {
 			},
 			serviceMock: func(c *mocks.Service) {
 				user := model.User{Username: "1", Password: "1", Session: ""}
-				c.Mock.On("SignUp", user).Return("ahsjufil12-fk", errors.New("invalid")).Times(1)
+				c.Mock.On("SignUp", user).Return("ahsjufil12-fk", ErrInvalidData).Times(1)
 			},
-			wantCode: http.StatusInternalServerError,
+			wantCode: http.StatusBadRequest,
 		},
 	}
 
