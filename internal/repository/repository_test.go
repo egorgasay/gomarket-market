@@ -6,6 +6,7 @@ import (
 	"github.com/egorgasay/dockerdb/v3"
 	_ "github.com/lib/pq"
 	"go-rest-api/config"
+	"go-rest-api/internal/constants"
 	"go-rest-api/internal/db"
 	"go-rest-api/internal/model"
 	"testing"
@@ -68,6 +69,62 @@ func Test_userRepository_CreateUser(t *testing.T) {
 			gormDB.Model(tt.args.user).Where("username = ?", tt.args.user.Username).Count(&count)
 			if count == 0 {
 				t.Fatal("Expected user to exist in database")
+			}
+		})
+	}
+}
+
+func Test_userRepository_GetUserByUsername(t *testing.T) {
+	type args struct {
+		user model.User
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr error
+	}{
+		{
+			name: "Valid user",
+
+			args: args{
+				user: model.User{
+					Username: "dima",
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "BAD",
+			args: args{
+				user: model.User{
+					Username: "1",
+					Password: "1",
+				},
+			},
+			wantErr: constants.ErrRecordNotFound,
+		},
+	}
+
+	ctx := context.TODO()
+	vdb, err := dockerdb.New(ctx, dockerdb.PostgresConfig("market").Build())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer vdb.Clear(ctx)
+
+	gormDB := db.NewDB(config.Config{DB: vdb.GetSQLConnStr()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	db := userRepository{
+		db: gormDB,
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data := model.User{}
+			if err = db.GetUserByUsername(&data, tt.args.user.Username); err != nil {
+				t.Errorf("got %v, want %v", err, tt.wantErr)
 			}
 		})
 	}

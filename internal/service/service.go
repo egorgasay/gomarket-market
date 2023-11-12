@@ -1,7 +1,7 @@
 package service
 
 import (
-	"fmt"
+	"go-rest-api/internal/constants"
 	"go-rest-api/internal/domains"
 	"go-rest-api/internal/model"
 	"go-rest-api/internal/validator"
@@ -32,7 +32,7 @@ func (s *Service) SignUp(user model.User) (string, error) {
 func (s *Service) Login(user model.User) error {
 	data := model.User{}
 	if err := s.database.GetUserByUsername(&data, user.Username); err != nil {
-		return fmt.Errorf("invalid data for login")
+		return constants.ErrInvalidLogin
 	}
 	return nil
 }

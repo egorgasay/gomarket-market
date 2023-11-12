@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"go-rest-api/internal/constants"
 	"go-rest-api/internal/domains"
 	"go-rest-api/internal/model"
 	"gorm.io/gorm"
@@ -22,8 +23,8 @@ func (ur *userRepository) CreateUser(user model.User) error {
 }
 
 func (ur *userRepository) GetUserByUsername(user *model.User, username string) error {
-	if err := ur.db.Where("username=?", username).First(user).Error; err != nil {
-		return err
+	if err := ur.db.Where("username=?", username).Limit(3).Find(&user).Error; err != nil {
+		return constants.ErrRecordNotFound
 	}
 	return nil
 }
