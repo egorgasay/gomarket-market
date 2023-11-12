@@ -26,5 +26,6 @@ func (ur *userRepository) GetUserByUsername(user *model.User, username string) e
 	if err := ur.db.Where("username=?", username).Limit(3).Find(&user).Error; err != nil {
 		return constants.ErrRecordNotFound
 	}
+
 	return nil
 }
