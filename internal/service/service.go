@@ -22,6 +22,7 @@ func (s *Service) SignUp(user model.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	newUser := model.User{Username: user.Username, Password: user.Password, Session: uuid}
 	if err := s.database.CreateUser(newUser); err != nil {
 		return "", err
@@ -34,5 +35,6 @@ func (s *Service) Login(user model.User) error {
 	if err := s.database.GetUserByUsername(&data, user.Username); err != nil {
 		return constants.ErrInvalidLogin
 	}
+
 	return nil
 }
