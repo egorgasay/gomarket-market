@@ -56,7 +56,7 @@ func Test_userService_SignUp(t *testing.T) {
 			session := mocks.NewSessionService(t)
 			tt.repositoryMock(storage, tt.args)
 			tt.sessionMock(session, tt.args)
-			service := userService{
+			service := Service{
 				database:       storage,
 				sessionService: session,
 			}

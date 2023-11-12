@@ -1,29 +1,23 @@
 package service
 
 import (
+	"fmt"
 	"go-rest-api/internal/domains"
 	"go-rest-api/internal/model"
 	"go-rest-api/internal/validator"
 )
 
-type userService struct {
+type Service struct {
 	database       domains.IRepository
 	validator      validator.IUserValidator
 	sessionService domains.SessionService
 }
 
 func NewUserUseCase(database domains.IRepository, validator validator.IUserValidator, sessionService domains.SessionService) domains.Service {
-	return &userService{database, validator, sessionService}
+	return &Service{database, validator, sessionService}
 }
 
-func (s *userService) SignUp(user model.User) (string, error) {
-	//if err := s.validator.UserValidate(user); err != nil {
-	//	return "", err
-	//}
-	//hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
-	//if err != nil {
-	//	return err
-	//}
+func (s *Service) SignUp(user model.User) (string, error) {
 	uuid, err := s.sessionService.Generate()
 	if err != nil {
 		return "", err
@@ -33,4 +27,12 @@ func (s *userService) SignUp(user model.User) (string, error) {
 		return "", err
 	}
 	return uuid, nil
+}
+
+func (s *Service) Login(user model.User) error {
+	data := model.User{}
+	if err := s.database.GetUserByUsername(&data, user.Username); err != nil {
+		return fmt.Errorf("invalid data for login")
+	}
+	return nil
 }

@@ -8,5 +8,6 @@ import (
 func NewRouter(uc controller2.IUserController) *echo.Echo {
 	e := echo.New()
 	e.POST("/v1/user/register", uc.SignUp)
+	e.POST("/v1/user/login", uc.Login)
 	return e
 }

@@ -27,6 +27,20 @@ func (_m *IRepository) CreateUser(user model.User) error {
 	return r0
 }
 
+// GetUserByUsername provides a mock function with given fields: user, email
+func (_m *IRepository) GetUserByUsername(user *model.User, email string) error {
+	ret := _m.Called(user, email)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*model.User, string) error); ok {
+		r0 = rf(user, email)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type mockConstructorTestingTNewIRepository interface {
 	mock.TestingT
 	Cleanup(func())
