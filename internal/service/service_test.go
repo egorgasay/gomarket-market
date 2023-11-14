@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"go-rest-api/internal/constants"
+	"go-rest-api/internal/controller"
 	"go-rest-api/internal/domains/mocks"
 	"go-rest-api/internal/model"
 	"testing"
@@ -87,7 +87,7 @@ func TestService_Login(t *testing.T) {
 			},
 			repositoryMock: func(c *mocks.IRepository, user model.User) {
 				data := model.User{}
-				c.Mock.On("GetUserByUsername", &data, user.Username).Return(nil)
+				c.Mock.On("GetUserByUsername", data, user.Username).Return(model.User{Username: "dima", Password: "test1", Session: "ahsjdfurol-12"}, nil)
 			},
 			wantErr: nil,
 		},
@@ -99,9 +99,9 @@ func TestService_Login(t *testing.T) {
 			},
 			repositoryMock: func(c *mocks.IRepository, user model.User) {
 				data := model.User{}
-				c.Mock.On("GetUserByUsername", &data, user.Username).Return(constants.ErrInvalidLogin).Times(1)
+				c.Mock.On("GetUserByUsername", data, user.Username).Return(model.User{}, controller.ErrInvalidLogin).Times(1)
 			},
-			wantErr: constants.ErrInvalidLogin,
+			wantErr: controller.ErrInvalidLogin,
 		},
 	}
 	for _, tt := range tests {

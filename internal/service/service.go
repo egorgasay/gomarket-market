@@ -1,7 +1,7 @@
 package service
 
 import (
-	"go-rest-api/internal/constants"
+	"go-rest-api/internal/controller"
 	"go-rest-api/internal/domains"
 	"go-rest-api/internal/model"
 	"go-rest-api/internal/validator"
@@ -32,9 +32,13 @@ func (s *Service) SignUp(user model.User) (string, error) {
 
 func (s *Service) Login(user model.User) error {
 	data := model.User{}
-	if err := s.database.GetUserByUsername(&data, user.Username); err != nil {
-		return constants.ErrInvalidLogin
+	userFromDB, err := s.database.GetUserByUsername(data, user.Username)
+	if err != nil {
+		return controller.ErrInvalidLogin
+	}
+	if userFromDB.Username == user.Username && userFromDB.Password == user.Password {
+		return nil
 	}
 
-	return nil
+	return controller.ErrInvalidLogin
 }

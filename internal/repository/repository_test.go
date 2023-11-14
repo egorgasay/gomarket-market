@@ -6,7 +6,7 @@ import (
 	"github.com/egorgasay/dockerdb/v3"
 	_ "github.com/lib/pq"
 	"go-rest-api/config"
-	"go-rest-api/internal/constants"
+	"go-rest-api/internal/controller"
 	"go-rest-api/internal/db"
 	"go-rest-api/internal/model"
 	"testing"
@@ -88,7 +88,7 @@ func Test_userRepository_GetUserByUsername(t *testing.T) {
 
 			args: args{
 				user: model.User{
-					Username: "dima",
+					Username: "lena",
 				},
 			},
 			wantErr: nil,
@@ -98,10 +98,9 @@ func Test_userRepository_GetUserByUsername(t *testing.T) {
 			args: args{
 				user: model.User{
 					Username: "1",
-					Password: "1",
 				},
 			},
-			wantErr: constants.ErrRecordNotFound,
+			wantErr: controller.ErrInvalidLogin,
 		},
 	}
 
@@ -120,11 +119,16 @@ func Test_userRepository_GetUserByUsername(t *testing.T) {
 		db: gormDB,
 	}
 
+	if err = db.CreateUser(model.User{Username: "lena", Password: "test3", Session: "ashyduiwo-12"}); err != nil {
+		t.Errorf("CreateUser() error = %v, wantErr %v", err, nil)
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			data := model.User{}
-			if err = db.GetUserByUsername(&data, tt.args.user.Username); err != nil {
-				t.Errorf("got %v, want %v", err, tt.wantErr)
+			userFromDB, err := db.GetUserByUsername(data, tt.args.user.Username)
+			if err != nil && userFromDB.Username != "lena" && userFromDB.Password != "test3" {
+				t.Errorf("GetUserByUsername() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

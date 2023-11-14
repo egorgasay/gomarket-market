@@ -31,6 +31,7 @@ func (s *userController) SignUp(c echo.Context) error {
 	if err != nil {
 		return Handler(c, err)
 	}
+
 	cookie := http.Cookie{}
 	cookie.Name = "token"
 	cookie.Value = uuid
@@ -45,10 +46,12 @@ func (s *userController) Login(c echo.Context) error {
 	if err := c.Bind(&data); err != nil {
 		return Handler(c, err)
 	}
+
 	err := s.userService.Login(data)
 	if err != nil {
 		return Handler(c, err)
 	}
+
 	c.Response().Status = http.StatusOK
 	return nil
 }
