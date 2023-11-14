@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"go-rest-api/internal/controller"
 	"go-rest-api/internal/domains/mocks"
 	"go-rest-api/internal/model"
 	"testing"
@@ -56,7 +57,7 @@ func Test_userService_SignUp(t *testing.T) {
 			session := mocks.NewSessionService(t)
 			tt.repositoryMock(storage, tt.args)
 			tt.sessionMock(session, tt.args)
-			service := userService{
+			service := Service{
 				database:       storage,
 				sessionService: session,
 			}
@@ -66,6 +67,53 @@ func Test_userService_SignUp(t *testing.T) {
 			}
 			if tt.wantErr == nil && cook != tt.args.Session {
 				t.Errorf("got %s, want %s", cook, tt.args.Session)
+			}
+		})
+	}
+}
+
+func TestService_Login(t *testing.T) {
+	tests := []struct {
+		name           string
+		args           model.User
+		repositoryMock repositoryMock[model.User]
+		wantErr        error
+	}{
+		{
+			name: "OK1",
+			args: model.User{
+				Username: "dima",
+				Password: "test1",
+			},
+			repositoryMock: func(c *mocks.IRepository, user model.User) {
+				data := model.User{}
+				c.Mock.On("GetUserByUsername", data, user.Username).Return(model.User{Username: "dima", Password: "test1", Session: "ahsjdfurol-12"}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			name: "BAD1",
+			args: model.User{
+				Username: "1",
+				Password: "1",
+			},
+			repositoryMock: func(c *mocks.IRepository, user model.User) {
+				data := model.User{}
+				c.Mock.On("GetUserByUsername", data, user.Username).Return(model.User{}, controller.ErrInvalidLogin).Times(1)
+			},
+			wantErr: controller.ErrInvalidLogin,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			storage := mocks.NewIRepository(t)
+			tt.repositoryMock(storage, tt.args)
+			service := Service{
+				database: storage,
+			}
+			err := service.Login(tt.args)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("got %v, want %v", err, tt.wantErr)
 			}
 		})
 	}

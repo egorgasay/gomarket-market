@@ -20,6 +20,11 @@ func Handler(c echo.Context, err error) error {
 			err := fmt.Sprintf("bad json %s", err)
 			return c.JSON(http.StatusBadRequest, err)
 		}
+
+		if errors.Is(err, ErrInvalidLogin) {
+			err := fmt.Sprintf("bad login and password %s", err)
+			return c.JSON(http.StatusUnauthorized, err)
+		}
 	}
 	c.Response().Status = http.StatusOK
 	return nil
